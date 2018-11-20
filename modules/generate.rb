@@ -3,6 +3,7 @@ require 'active_support/inflector'
 module Meg
   class MyGenerate < SubThor
     attr_accessor :pluginname
+    $application_path = "#{__dir__}/.."
 
     include Thor::Actions
     include MyCli::SharedMethods
@@ -54,11 +55,11 @@ module Meg
             raise Thor::Error, "No application '#{appdir}' has been found"
             return
         end
-	if (!File.directory?("templates/plugins/#{plugintype}"))
+	if (!File.directory?($application_path + "/templates/plugins/#{plugintype}"))
             raise Thor::Error, "No templates found for plugin type '#{plugintype}'"
             return
         end
-	directory "../templates/plugins/#{plugintype}/", "#{appdir}/", opts
+	directory $application_path + "/templates/plugins/#{plugintype}/", "#{appdir}/", opts
     end
 
   end

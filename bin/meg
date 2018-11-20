@@ -12,20 +12,26 @@ module Meg
   end
 
   $modules = []
+  $application_path = "#{__dir__}/.."
+  
   CLASS_REGEX = /class\s(\w+)\s+\<\s+\SubThor/
   begin
+      
     # load shared libraries
-    Dir.glob('./lib/*.rb').each do |file|
+    lib_files = $application_path + "/lib/*.rb"
+    Dir.glob(lib_files).each do |file|
       require file
     end
 
     # load module code
-    Dir.glob('./concerns/*.rb').each do |file|
+    concerns_files = $application_path + "/concerns/*.rb"
+    Dir.glob(concerns_files).each do |file|
       require file
     end
 
     # load modules
-    Dir.glob('./modules/*.rb').each do |mod_file|
+    modules_files = $application_path + "/modules/*.rb"
+    Dir.glob(modules_files).each do |mod_file|
       require mod_file
       $modules << open(mod_file) do |file|
         file.grep(CLASS_REGEX) do |line|
@@ -61,14 +67,15 @@ module Meg
     desc "new PROJECTNAME", "Generates a new project skeleton named PROJECTNAME"
     def new(projectname)
       self.projectname = projectname
+
       projecttype = options[:projecttype]
       opts = { :projectname => projectname }
       puts "Generating project skeleton for '#{projectname}' with type '#{projecttype}'"
-      if (!File.directory?("templates/projects/#{projecttype}"))
+      if (!File.directory?("#{__dir__}/../templates/projects/#{projecttype}"))
 	raise Thor::Error, "No templates found for application type '#{projecttype}'"
 	return
       end
-      directory "../templates/projects/#{projecttype}/", "#{projectname.downcase.gsub(" ", "-")}/", opts
+      directory "#{__dir__}/../templates/projects/#{projecttype}/", "#{projectname.downcase.gsub(" ", "-")}/", opts
     end
 
     # load in the subcommands
