@@ -1,0 +1,159 @@
+<?php
+
+class ControllerExtensionModule<%= classname %> extends Controller {
+    private $error = array();
+    private $success = "";
+    private $data = array();
+    
+    public function __construct($registry) {
+        parent::__construct($registry);
+
+        $this->load->model('extension/module/<%= filename %>');
+        $this->load->language('extension/module/<%= filename %>');
+        $this->document->setTitle($this->language->get('heading_title'));
+        
+        $this->data['breadcrumbs'] = array();
+        $this->data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_home'),
+            'href' => $this->url->link('common/dashboard', "user_token={$this->session->data['user_token']}", true)
+        );
+        
+        $this->data['breadcrumbs'][] = array(
+            'text' => $this->language->get('heading_title'),
+            'href' => $this->url->link('extension/module/<%= filename %>', "user_token={$this->session->data['user_token']}", true)
+        );
+        
+        $this->data['header'] = $this->load->controller('common/header');
+        $this->data['column_left'] = $this->load->controller('common/column_left');
+        $this->data['footer'] = $this->load->controller('common/footer');
+        $this->data['user_token'] = $this->session->data['user_token'];
+    }
+    
+    public function index() {
+        $this->data['module'] = $this->url->link('marketplace/extension', "user_token={$this->session->data['user_token']}&type=module", true);
+        $this->data['add'] = $this->url->link('extension/module/<%= filename %>/add', "user_token={$this->session->data['user_token']}", true);
+        $this->data['edit'] = $this->url->link('extension/module/<%= filename %>/edit', "user_token={$this->session->data['user_token']}&<%= filename %>_id=", true);
+        $this->data['delete'] = $this->url->link('extension/module/<%= filename %>/delete', "user_token={$this->session->data['user_token']}", true);
+        
+        if (isset($this->request->get['filter_<%= config[:fields].first.split(":")[0] %>'])) {
+            $this->data['filter_<%= config[:fields].first.split(":")[0] %>'] = $this->request->get['filter_<%= config[:fields].first.split(":")[0] %>'];
+            $this->data['data'] = $this->model_extension_module_<%= filename %>->getList(array("filter_<%= config[:fields].first.split(":")[0] %>" => $this->data['filter_name']));
+        } else {
+            // TODO implement method to get list data
+            $this->data['data'] = $this->model_extension_module_<%= filename %>->getList();
+        }    
+        
+        $this->data['error'] = $this->error;
+        $this->data['success'] = $this->success;
+        
+        $this->response->setOutput($this->load->view('extension/module/<%= filename %>', $this->data));
+    }
+    
+    public function add() {
+        $this->data['breadcrumbs'][] = array(
+            'text' => "Novo",
+            'href' => $this->url->link('extension/module/<%= filename %>/add', "user_token={$this->session->data['user_token']}", true)
+        );
+        
+        $this->data['module'] = $this->url->link('extension/module/<%= filename %>', "user_token={$this->session->data['user_token']}", true);
+        $this->data['save'] = $this->url->link('extension/module/<%= filename %>/add', "user_token={$this->session->data['user_token']}", true);
+        
+        if ($this->request->post) {
+            if ($this->model_extension_module_<%= filename %>->save($this->request->post)) {
+                $this->success = "Dados Salvos com sucesso";
+            } else {
+                $this->error = "Não foi possível salvar estes dados";
+            }
+        }
+        
+        $this->data['error'] = $this->error;
+        $this->data['success'] = $this->success;
+        
+        $this->response->setOutput($this->load->view('extension/module/<%= filename %>_add', $this->data));
+    }
+    
+    public function edit() {
+        $this->data['breadcrumbs'][] = array(
+            'text' => "Editar",
+            'href' => $this->url->link('extension/module/<%= filename %>/edit', "user_token={$this->session->data['user_token']}", true)
+        );
+
+        $<%= filename %>_id = $this->request->request['<%= filename %>_id'];
+        if ($this->request->post) {
+            if ($this->model_extension_module_<%= filename %>->save($this->request->post, $<%= filename %>_id)) {
+                $this->success = "Dados Salvos com sucesso";
+            } else {
+                $this->error = "Não foi possível salvar estes dados";
+            }
+        }
+        
+        $this->data['module'] = $this->url->link('extension/module/<%= filename %>', "user_token={$this->session->data['user_token']}", true);
+        $this->data['save'] = $this->url->link('extension/module/<%= filename %>/edit', "user_token={$this->session->data['user_token']}&<%= filename %>_id={$<%= filename %>_id}", true);
+        
+        // TODO implement method to get data
+        $this->data['data'] = $this->model_extension_module_<%= filename %>->get($<%= filename %>_id);
+        
+        $this->data['error'] = $this->error;
+        $this->data['success'] = $this->success;
+        
+        $this->response->setOutput($this->load->view('extension/module/<%= filename %>_edit', $this->data));
+    }
+    
+    public function delete() {
+        if (!$this->model_extension_module_<%= filename %>->delete($this->request->post['selected'])) {
+            $this->error = "Não foi possível remover um ou mais itens selecionados";
+        }
+        $this->index();
+    }
+    
+    // TODO implement method autocomplete to filter
+    public function autocomplete() {
+        $json = array();
+
+        if (isset($this->request->get['filter_<%= config[:fields].first.split(":")[0] %>'])) {
+            if (isset($this->request->get['filter_<%= config[:fields].first.split(":")[0] %>'])) {
+                $filter_<%= config[:fields].first.split(":")[0] %> = $this->request->get['filter_<%= config[:fields].first.split(":")[0] %>'];
+            } else {
+                $filter_<%= config[:fields].first.split(":")[0] %> = '';
+            }
+
+            if (isset($this->request->get['limit'])) {
+                $limit = $this->request->get['limit'];
+            } else {
+                $limit = 5;
+            }
+
+            $filter_data = array(
+                'filter_<%= config[:fields].first.split(":")[0] %>' => $filter_<%= config[:fields].first.split(":")[0] %>,
+                'start' => 0,
+                'limit' => $limit
+            );
+
+            $json = $this->model_extension_module_<%= filename %>->getList($filter_data);
+        }
+
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
+    }
+    
+    public function install() {
+        $this->load->model('setting/setting');
+        $data = array(
+            "module_<%= filename %>_status" => true
+        );
+        
+        $this->model_setting_setting->editSetting("module_<%= filename %>", $data);
+        $this->model_extension_module_<%= filename %>->install();
+    }
+
+    public function uninstall() {
+        $this->model_extension_module_<%= filename %>->uninstall();
+    }
+    
+    protected function validate() {
+        if (!$this->user->hasPermission('modify', 'extension/module/<%= filename %>')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+        return !$this->error;
+    }
+}
