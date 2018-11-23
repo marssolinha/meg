@@ -1,0 +1,21 @@
+<?php
+
+class ControllerExtensionModule<%= classname %> extends Controller {
+    protected $data = array();
+    
+    public function __construct($registry) {
+        parent::__construct($registry);
+
+        $this->load->model('extension/module/<%= filename %>');
+        $this->load->language('extension/module/<%= filename %>');
+        
+        $this->document->addScript('catalog/view/javascript/opentheme/<%= filename %>/<%= filename %>.js');
+        $this->document->addStyle('catalog/view/theme/default/stylesheet/opentheme/<%= filename %>/<%= filename %>.css');
+    }
+    
+    public function index() {
+        $this->data["data"] = $this->model_extension_module_<%= filename %>->getAll();
+        
+        return $this->load->view('extension/module/<%= filename %>', $this->data);
+    }
+}

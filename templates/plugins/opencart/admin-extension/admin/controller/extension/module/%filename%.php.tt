@@ -27,6 +27,9 @@ class ControllerExtensionModule<%= classname %> extends Controller {
         $this->data['column_left'] = $this->load->controller('common/column_left');
         $this->data['footer'] = $this->load->controller('common/footer');
         $this->data['user_token'] = $this->session->data['user_token'];
+        
+        $this->load->model('tool/image');
+        $this->data['placeholder'] = $this->model_tool_image->resize('no_image.png', 100, 100);
     }
     
     public function index() {
@@ -37,7 +40,7 @@ class ControllerExtensionModule<%= classname %> extends Controller {
         
         if (isset($this->request->get['filter_<%= config[:fields].first.split(":")[0] %>'])) {
             $this->data['filter_<%= config[:fields].first.split(":")[0] %>'] = $this->request->get['filter_<%= config[:fields].first.split(":")[0] %>'];
-            $this->data['data'] = $this->model_extension_module_<%= filename %>->getList(array("filter_<%= config[:fields].first.split(":")[0] %>" => $this->data['filter_name']));
+            $this->data['data'] = $this->model_extension_module_<%= filename %>->getList(array("filter_<%= config[:fields].first.split(":")[0] %>" => $this->data['filter_<%= config[:fields].first.split(":")[0].downcase %>']));
         } else {
             // TODO implement method to get list data
             $this->data['data'] = $this->model_extension_module_<%= filename %>->getList();
