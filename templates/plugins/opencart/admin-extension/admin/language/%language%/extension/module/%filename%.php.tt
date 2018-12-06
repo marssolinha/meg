@@ -1,3 +1,7 @@
 <?php
 
 $_['heading_title'] = "<%= heading %>";
+<%- config[:fields].each do |field| -%>
+$_["entry_<%= field.split(':')[0].downcase %>"] = "<%= field.split(':')[0].capitalize %>";
+$_["placeholder_<%= field.split(':')[0].downcase %>"] = "<%= field.split(':')[0].capitalize %>";
+<%- end -%>

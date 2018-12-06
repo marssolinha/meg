@@ -11,7 +11,21 @@ class ModelExtensionModule<%= classname %> extends Model {
             $sql .= " WHERE <%= config[:fields].first.split(":")[0] %> LIKE '%{$this->db->escape($data['filter_<%= config[:fields].first.split(":")[0] %>'])}%'";
         }
         
-        $sql .= " ORDER BY <%= config[:fields].first.split(":")[0] %> ASC";
+        $sort_data = array(
+			'<%= config[:fields].first.split(":")[0] %>'
+		);
+		
+		if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
+			$sql .= " ORDER BY " . $data['sort'];
+		} else {
+			$sql .= " ORDER BY <%= config[:fields].first.split(":")[0] %>";
+		}
+
+		if (isset($data['order']) && ($data['order'] == 'DESC')) {
+			$sql .= " DESC";
+		} else {
+			$sql .= " ASC";
+		}
         
         if (isset($data['start']) || isset($data['limit'])) {
             if ($data['start'] < 0)
@@ -24,6 +38,17 @@ class ModelExtensionModule<%= classname %> extends Model {
         
         $query = $this->db->query($sql);
         return $query->rows;
+    }
+    
+    public function getTotal($data = array()) {
+        $sql = "SELECT COUNT(*) AS num_items FROM {$this->table}";
+        
+        if (isset($data['filter_<%= config[:fields].first.split(":")[0] %>']) && $data['filter_<%= config[:fields].first.split(":")[0] %>'] !== '') {
+            $sql .= " WHERE <%= config[:fields].first.split(":")[0] %> LIKE '%{$this->db->escape($data['filter_<%= config[:fields].first.split(":")[0] %>'])}%'";
+        }
+        
+        $query = $this->db->query($sql);
+        return $query->row['num_items'];
     }
     
     public function get($<%= filename %>_id) {
