@@ -1,6 +1,6 @@
 <?php
 
-class ControllerExtensionModule<%= classname %> extends Controller {
+class ControllerExtension<%= extension_class %><%= classname %> extends Controller {
     private $error = array();
     private $success = "";
     private $param = "";
@@ -26,8 +26,8 @@ class ControllerExtensionModule<%= classname %> extends Controller {
             $this->param .= "&page={$this->request->get['page']}";
         }
 
-        $this->load->model('extension/module/<%= filename %>');
-        $this->load->language('extension/module/<%= filename %>');
+        $this->load->model('extension/<%= extension %>/<%= filename %>');
+        $this->load->language('extension/<%= extension %>/<%= filename %>');
         $this->document->setTitle($this->language->get('heading_title'));
         
         $this->data['breadcrumbs'] = array();
@@ -38,7 +38,7 @@ class ControllerExtensionModule<%= classname %> extends Controller {
         
         $this->data['breadcrumbs'][] = array(
             'text' => $this->language->get('heading_title'),
-            'href' => $this->url->link('extension/module/<%= filename %>', "user_token={$this->session->data['user_token']}{$this->param}", true)
+            'href' => $this->url->link('extension/<%= extension %>/<%= filename %>', "user_token={$this->session->data['user_token']}{$this->param}", true)
         );
         
         $this->data['header'] = $this->load->controller('common/header');
@@ -51,10 +51,10 @@ class ControllerExtensionModule<%= classname %> extends Controller {
     }
     
     public function index() {
-        $this->data['module'] = $this->url->link('marketplace/extension', "user_token={$this->session->data['user_token']}{$this->param}&type=module", true);
-        $this->data['add'] = $this->url->link('extension/module/<%= filename %>/add', "user_token={$this->session->data['user_token']}{$this->param}", true);
-        $this->data['edit'] = $this->url->link('extension/module/<%= filename %>/edit', "user_token={$this->session->data['user_token']}{$this->param}&<%= filename %>_id=", true);
-        $this->data['delete'] = $this->url->link('extension/module/<%= filename %>/delete', "user_token={$this->session->data['user_token']}{$this->param}", true);
+        $this->data['module'] = $this->url->link('marketplace/extension', "user_token={$this->session->data['user_token']}{$this->param}&type=<%= extension %>", true);
+        $this->data['add'] = $this->url->link('extension/<%= extension %>/<%= filename %>/add', "user_token={$this->session->data['user_token']}{$this->param}", true);
+        $this->data['edit'] = $this->url->link('extension/<%= extension %>/<%= filename %>/edit', "user_token={$this->session->data['user_token']}{$this->param}&<%= filename %>_id=", true);
+        $this->data['delete'] = $this->url->link('extension/<%= extension %>/<%= filename %>/delete', "user_token={$this->session->data['user_token']}{$this->param}", true);
         
         $sort = !isset($this->request->get['sort']) ? '<%= config[:fields].first.split(":")[0] %>' : $this->request->get['sort'];
         $order = !isset($this->request->get['order']) ? 'ASC' : $this->request->get['order'];
@@ -76,7 +76,7 @@ class ControllerExtensionModule<%= classname %> extends Controller {
             $url .= '&order=ASC';
         }
         
-        $this->data['sort_<%= config[:fields].first.split(":")[0] %>'] = $this->url->link('extension/module/<%= filename %>', 'user_token=' . $this->session->data['user_token'] . '&sort=<%= config[:fields].first.split(":")[0] %>' . $url, true);
+        $this->data['sort_<%= config[:fields].first.split(":")[0] %>'] = $this->url->link('extension/<%= extension %>/<%= filename %>', 'user_token=' . $this->session->data['user_token'] . '&sort=<%= config[:fields].first.split(":")[0] %>' . $url, true);
         
         $url = '';
         if(isset($filter)) {
@@ -100,37 +100,37 @@ class ControllerExtensionModule<%= classname %> extends Controller {
             'limit' => $limit
         );
         
-        $total_items = $this->model_extension_module_<%= filename %>->getTotal($data);
+        $total_items = $this->model_extension_<%= extension %>_<%= filename %>->getTotal($data);
         
         $pagination = new Pagination();
         $pagination->total = $total_items;
         $pagination->page = $page;
         $pagination->limit = $limit;
-        $pagination->url = $this->url->link('extension/module/<%= filename %>', 'user_token=' . $this->session->data['user_token'] . $url . '&page={page}', true);
+        $pagination->url = $this->url->link('extension/<%= extension %>/<%= filename %>', 'user_token=' . $this->session->data['user_token'] . $url . '&page={page}', true);
         
         $this->data['pagination'] = $pagination->render();
 		$this->data['results'] = sprintf($this->language->get('text_pagination'), ($total_items) ? (($page - 1) * $limit) + 1 : 0, ((($page - 1) * $limit) > ($total_items - $limit)) ? $total_items : ((($page - 1) * $limit) + $limit), $total_items, ceil($total_items / $limit));
         
         $this->data['order'] = $order;
         $this->data['sort'] = $sort;
-        $this->data['data'] = $this->model_extension_module_<%= filename %>->getList($data);
+        $this->data['data'] = $this->model_extension_<%= extension %>_<%= filename %>->getList($data);
         $this->data['error'] = $this->error;
         $this->data['success'] = $this->success;
         
-        $this->response->setOutput($this->load->view('extension/module/<%= filename %>', $this->data));
+        $this->response->setOutput($this->load->view('extension/<%= extension %>/<%= filename %>', $this->data));
     }
     
     public function add() {
         $this->data['breadcrumbs'][] = array(
             'text' => "Novo",
-            'href' => $this->url->link('extension/module/<%= filename %>/add', "user_token={$this->session->data['user_token']}{$this->param}", true)
+            'href' => $this->url->link('extension/<%= extension %>/<%= filename %>/add', "user_token={$this->session->data['user_token']}{$this->param}", true)
         );
         
-        $this->data['module'] = $this->url->link('extension/module/<%= filename %>', "user_token={$this->session->data['user_token']}{$this->param}", true);
-        $this->data['save'] = $this->url->link('extension/module/<%= filename %>/add', "user_token={$this->session->data['user_token']}{$this->param}", true);
+        $this->data['module'] = $this->url->link('extension/<%= extension %>/<%= filename %>', "user_token={$this->session->data['user_token']}{$this->param}", true);
+        $this->data['save'] = $this->url->link('extension/<%= extension %>/<%= filename %>/add', "user_token={$this->session->data['user_token']}{$this->param}", true);
         
         if ($this->request->post) {
-            if ($this->model_extension_module_<%= filename %>->save($this->request->post)) {
+            if ($this->model_extension_<%= extension %>_<%= filename %>->save($this->request->post)) {
                 $this->success = "Dados Salvos com sucesso";
             } else {
                 $this->error = "Não foi possível salvar estes dados";
@@ -140,38 +140,38 @@ class ControllerExtensionModule<%= classname %> extends Controller {
         $this->data['error'] = $this->error;
         $this->data['success'] = $this->success;
         
-        $this->response->setOutput($this->load->view('extension/module/<%= filename %>_add', $this->data));
+        $this->response->setOutput($this->load->view('extension/<%= extension %>/<%= filename %>_add', $this->data));
     }
     
     public function edit() {
         $this->data['breadcrumbs'][] = array(
             'text' => "Editar",
-            'href' => $this->url->link('extension/module/<%= filename %>/edit', "user_token={$this->session->data['user_token']}{$this->param}", true)
+            'href' => $this->url->link('extension/<%= extension %>/<%= filename %>/edit', "user_token={$this->session->data['user_token']}{$this->param}", true)
         );
 
         $<%= filename %>_id = $this->request->request['<%= filename %>_id'];
         if ($this->request->post) {
-            if ($this->model_extension_module_<%= filename %>->save($this->request->post, $<%= filename %>_id)) {
+            if ($this->model_extension_<%= extension %>_<%= filename %>->save($this->request->post, $<%= filename %>_id)) {
                 $this->success = "Dados Salvos com sucesso";
             } else {
                 $this->error = "Não foi possível salvar estes dados";
             }
         }
         
-        $this->data['module'] = $this->url->link('extension/module/<%= filename %>', "user_token={$this->session->data['user_token']}{$this->param}", true);
-        $this->data['save'] = $this->url->link('extension/module/<%= filename %>/edit', "user_token={$this->session->data['user_token']}{$this->param}&<%= filename %>_id={$<%= filename %>_id}", true);
+        $this->data['module'] = $this->url->link('extension/<%= extension %>/<%= filename %>', "user_token={$this->session->data['user_token']}{$this->param}", true);
+        $this->data['save'] = $this->url->link('extension/<%= extension %>/<%= filename %>/edit', "user_token={$this->session->data['user_token']}{$this->param}&<%= filename %>_id={$<%= filename %>_id}", true);
         
         // TODO implement method to get data
-        $this->data['data'] = $this->model_extension_module_<%= filename %>->get($<%= filename %>_id);
+        $this->data['data'] = $this->model_extension_<%= extension %>_<%= filename %>->get($<%= filename %>_id);
         
         $this->data['error'] = $this->error;
         $this->data['success'] = $this->success;
         
-        $this->response->setOutput($this->load->view('extension/module/<%= filename %>_edit', $this->data));
+        $this->response->setOutput($this->load->view('extension/<%= extension %>/<%= filename %>_edit', $this->data));
     }
     
     public function delete() {
-        if (!$this->model_extension_module_<%= filename %>->delete($this->request->post['selected'])) {
+        if (!$this->model_extension_<%= extension %>_<%= filename %>->delete($this->request->post['selected'])) {
             $this->error = "Não foi possível remover um ou mais itens selecionados";
         }
         $this->index();
@@ -200,7 +200,7 @@ class ControllerExtensionModule<%= classname %> extends Controller {
                 'limit' => $limit
             );
 
-            $json = $this->model_extension_module_<%= filename %>->getList($filter_data);
+            $json = $this->model_extension_<%= extension %>_<%= filename %>->getList($filter_data);
         }
 
         $this->response->addHeader('Content-Type: application/json');
@@ -210,19 +210,19 @@ class ControllerExtensionModule<%= classname %> extends Controller {
     public function install() {
         $this->load->model('setting/setting');
         $data = array(
-            "module_<%= filename %>_status" => true
+            "<%= extension %>_<%= filename %>_status" => true
         );
         
-        $this->model_setting_setting->editSetting("module_<%= filename %>", $data);
-        $this->model_extension_module_<%= filename %>->install();
+        $this->model_setting_setting->editSetting("<%= extension %>_<%= filename %>", $data);
+        $this->model_extension_<%= extension %>_<%= filename %>->install();
     }
 
     public function uninstall() {
-        $this->model_extension_module_<%= filename %>->uninstall();
+        $this->model_extension_<%= extension %>_<%= filename %>->uninstall();
     }
     
     protected function validate() {
-        if (!$this->user->hasPermission('modify', 'extension/module/<%= filename %>')) {
+        if (!$this->user->hasPermission('modify', 'extension/<%= extension %>/<%= filename %>')) {
             $this->error['warning'] = $this->language->get('error_permission');
         }
         return !$this->error;

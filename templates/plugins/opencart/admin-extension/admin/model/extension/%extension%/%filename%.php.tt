@@ -1,6 +1,6 @@
 <?php
 
-class ModelExtensionModule<%= classname %> extends Model {
+class ModelExtension<%= extension_class %><%= classname %> extends Model {
     protected $table = DB_PREFIX."<%= filename %>";
     
     public function getList($data = NULL) {

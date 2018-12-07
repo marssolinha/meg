@@ -102,7 +102,7 @@
     $('input[name=filter_<%= config[:fields].first.split(":")[0].downcase %>]').autocomplete({
         'source': function (request, response) {
             $.ajax({
-                url: 'index.php?route=extension/module/<%= filename %>/autocomplete&user_token={{ user_token }}&filter_<%= config[:fields].first.split(":")[0] %>=' + encodeURIComponent(request),
+                url: 'index.php?route=extension/<%= extension %>/<%= filename %>/autocomplete&user_token={{ user_token }}&filter_<%= config[:fields].first.split(":")[0] %>=' + encodeURIComponent(request),
                 dataType: 'json',
                 success: function (json) {
                     response($.map(json, function (item) {
@@ -127,7 +127,7 @@
             url += '&filter_<%= config[:fields].first.split(":")[0].downcase %>=' + encodeURIComponent(filter_<%= config[:fields].first.split(":")[0].downcase %>);
         }
         
-        location = 'index.php?route=extension/module/<%= filename %>&user_token={{ user_token }}' + url;
+        location = 'index.php?route=extension/<%= extension %>/<%= filename %>&user_token={{ user_token }}' + url;
     });
     $(document).ready(function () {
         $("#form").on("submit", function (ev) {
